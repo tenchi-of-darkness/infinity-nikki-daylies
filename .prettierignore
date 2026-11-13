@@ -1,0 +1,8 @@
+.next/
+out/
+build/
+coverage/
+node_modules/
+src/components/ui/
+pnpm-lock.yaml
+AGENTS.md

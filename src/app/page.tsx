@@ -1,69 +1,141 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+
+const categories = [
+  {
+    title: "Daily rewards",
+    tasks: [
+      "Complete Daily Wishes",
+      "Complete Starlit Moments",
+      "Claim available login rewards",
+    ],
+  },
+  {
+    title: "Energy and realms",
+    tasks: [
+      "Spend Vital Energy in a Realm",
+      "Claim Realm of Breakthrough rewards (weekly)",
+    ],
+  },
+  {
+    title: "Gathering and exploration",
+    tasks: [
+      "Collect and restart Dig, Pear-Pal",
+      "Gather materials for crafting or Daily Wishes",
+      "Purify Esselings if needed",
+    ],
+  },
+  {
+    title: "Home and crafting",
+    tasks: [
+      "Collect ready home resources",
+      "Replant crops or restart production",
+      "Craft clothing or upgrade a Eureka if needed",
+    ],
+  },
+  {
+    title: "Optional",
+    tasks: [
+      "Play mini-games or take photos for a Daily Wish",
+      "Check limited-time event tasks",
+    ],
+  },
+];
+
+export default function HomePage() {
+  const [completed, setCompleted] = useState<string[]>([]);
+
+  const allTasks = categories.flatMap((category) => category.tasks);
+  const doneCount = completed.length;
+
+  function toggleTask(task: string) {
+    setCompleted((current) =>
+      current.includes(task)
+        ? current.filter((item) => item !== task)
+        : [...current, task],
+    );
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="min-h-screen bg-[#faf7fb] font-[Arial,sans-serif] text-[#322b36]">
+      <div className="mx-auto max-w-[760px] px-6 py-12">
+        <header className="mb-7">
+          <p className="text-xs font-bold tracking-[0.15em] text-[#92709f]">
+            INFINITY NIKKI
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <h1 className="my-2 text-[clamp(32px,7vw,48px)] font-bold">
+            Daily checklist
+          </h1>
+          <p className="text-[#706875]">Keep track of your Miraland routine.</p>
+
+          <div
+            className="my-6 mb-2 flex items-center justify-between text-sm"
+            aria-live="polite"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <span>
+              {doneCount} of {allTasks.length} tasks complete
+            </span>
+            <Button
+              className="cursor-pointer border-0 bg-transparent text-[#79528b] underline"
+              onClick={() => setCompleted([])}
+            >
+              Clear checklist
+            </Button>
+          </div>
+          <progress
+            className="h-2.5 w-full accent-[#a77db8]"
+            value={doneCount}
+            max={allTasks.length}
+          />
+        </header>
+
+        <div className="grid gap-4">
+          {categories.map((category) => (
+            <Card className="bg-white" key={category.title}>
+              <CardHeader>
+                <CardTitle className="font-bold">{category.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="grid list-none gap-3">
+                {category.tasks.map((task, index) => {
+                  const isChecked = completed.includes(task);
+
+                  return (
+                    <div
+                      key={task}
+                      className={`flex cursor-pointer items-center gap-3 leading-[1.45] ${isChecked ? "text-[#928b96] line-through" : ""
+                        }`}
+                    >
+                      <Checkbox
+                        id={`checkbox-${index}`}
+                        name={`checkbox-${index}`}
+                        className="mt-px h-[18px] w-[18px] accent-[#9c6eae]"
+                        onCheckedChange={() => toggleTask(task)}
+                        checked={isChecked}
+                      />
+                      <Label htmlFor={`checkbox-${index}`}>{task}</Label>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </main>
-    </div>
+
+        <footer className="mt-6 text-[13px] text-[#817985]">
+          Tasks can change with updates and limited-time events.
+        </footer>
+      </div>
+    </main>
   );
 }
