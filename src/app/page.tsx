@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Progress, ProgressLabel, ProgressValue } from "@/components/ui/progress";
+import { Progress, ProgressLabel, ProgressValue, ProgressTrack, ProgressIndicator } from "@/components/ui/progress";
 import { useState } from "react";
 
 const categories = [
@@ -80,19 +80,39 @@ const categories = [
       "Pull on banners",
     ],
   },
-];
+] as const;
+
+type CompletionState = Partial<
+  Record<(typeof categories)[number]["title"], string[]>
+>;
 
 export default function HomePage() {
-  const [completed, setCompleted] = useState<string[]>([]);
+  const [completed, setCompleted] = useState<CompletionState>({});
 
-  const allTasks = categories.flatMap((category) => category.tasks);
-  const doneCount = completed.length;
+  const doneCount = Object.values(completed).reduce(
+    (total, category) => total + (category?.length ?? 0),
+    0,
+  );
 
-  function toggleTask(task: string) {
-    setCompleted((current) =>
-      current.includes(task)
-        ? current.filter((item) => item !== task)
-        : [...current, task],
+  const taskCount = Object.values(categories).flatMap(x => x.tasks).length;
+
+  function toggleTask(category: keyof CompletionState, task: string) {
+    setCompleted((currentState) => {
+      let newState = { ...currentState }
+
+      if (newState[category] === undefined) {
+        newState[category] = [task]
+      } else {
+        if (newState[category].includes(task)) {
+          newState[category] = newState[category].filter(x => x !== task)
+        } else {
+          newState[category] = [...newState[category], task]
+        }
+      }
+
+      return newState;
+    }
+
     );
   }
 
@@ -108,17 +128,17 @@ export default function HomePage() {
           </h1>
           <p className="text-muted-foreground">Keep track of your Miraland routine.</p>
 
-          <Progress value={doneCount / allTasks.length * 100} className="my-6 mb-2 text-sm">
-            <ProgressLabel>Upload progress</ProgressLabel>
-            <ProgressValue />
+          <Progress value={doneCount / taskCount * 100} className="my-6 mb-2">
+            <ProgressLabel className={"text-md"}>Completion</ProgressLabel>
+            <ProgressValue className={"text-md"} />
           </Progress>
 
           <div className="flex justify-between">
             <p>
-              {doneCount} of {allTasks.length} tasks complete
+              {doneCount} of {taskCount} tasks complete
             </p>
             <Button
-              onClick={() => setCompleted([])}
+              onClick={() => setCompleted({})}
             >
               Clear checklist
             </Button>
@@ -133,8 +153,12 @@ export default function HomePage() {
                 <CardTitle className="font-bold">{category.title}</CardTitle>
               </CardHeader>
               <CardContent className="grid list-none gap-3">
+                <Progress value={(completed[category.title]?.length ?? 0) / category.tasks.length * 100} className="mb-2 text-sm">
+                  <ProgressLabel>Completion</ProgressLabel>
+                  <ProgressValue />
+                </Progress>
                 {category.tasks.map((task, index) => {
-                  const isChecked = completed.includes(task);
+                  const isChecked = completed[category.title]?.includes(task) ?? false;
 
                   return (
                     <div
@@ -146,7 +170,7 @@ export default function HomePage() {
                         id={`checkbox-${category.title}-${index}`}
                         name={`checkbox-${category.title}-${index}`}
                         className="mt-px h-[18px] w-[18px]"
-                        onCheckedChange={() => toggleTask(task)}
+                        onCheckedChange={() => toggleTask(category.title, task)}
                         checked={isChecked}
                       />
                       <Label htmlFor={`checkbox-${category.title}-${index}`}>{task}</Label>
