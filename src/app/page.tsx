@@ -15,7 +15,7 @@ import { useState } from "react";
 
 const categories = [
   {
-    title: "Daily rewards",
+    title: "Daily tasks",
     tasks: [
       "Complete Daily Wishes",
       "Complete Starlit Moments",
@@ -26,9 +26,9 @@ const categories = [
   {
     title: "Weekly rewards",
     tasks: [
-      "Claim Realm of Breakthrough rewards (weekly)",
-      "Complete Starlit Moments",
-      "Claim available login rewards",
+      "Claim Realm of Breakthrough rewards (2x)",
+      "Complete Starlit Pursuit courses (3x)",
+      "Battle in Miracrown Merit area (3x)",
     ],
   },
   {
