@@ -1,5 +1,26 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Run Next.js and Convex with Docker
+
+This Compose setup runs a self-hosted Convex backend and the Next.js development server. Compose Watch syncs source edits into the Next.js container; the Convex CLI runs there too and watches/deploys changes under `convex/`.
+
+1. Start Convex and generate a local admin key:
+
+   ```bash
+   docker compose up -d convex
+   docker compose exec convex ./generate_admin_key.sh
+   ```
+
+2. Copy `.env.example` to `.env` and put the generated key in `CONVEX_SELF_HOSTED_ADMIN_KEY`.
+
+3. Start the app and Compose Watch:
+
+   ```bash
+   docker compose up --watch
+   ```
+
+Open [http://localhost:3000](http://localhost:3000) for Next.js and [http://localhost:6791](http://localhost:6791) for the Convex dashboard. Sign in to the dashboard with the admin key generated in step 1. Convex is available at `http://localhost:3210` and its HTTP actions at `http://localhost:3211`. Compose Watch requires Docker Compose 2.22 or newer. The default Convex instance secret is for local development only.
+
 ## Getting Started
 
 First, run the development server:

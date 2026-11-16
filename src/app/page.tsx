@@ -12,14 +12,26 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Progress, ProgressLabel, ProgressValue, ProgressTrack, ProgressIndicator } from "@/components/ui/progress";
 import { useMutation, useQuery } from "convex/react";
+import { useEffect } from "react";
 import { api } from "../../convex/_generated/api";
+import { useAppAuth } from "@/providers/convex-client-provider";
 
 export default function HomePage() {
+  const { user, isLoading: authLoading, signIn, signOut } = useAppAuth();
   const categories = useQuery(api.queries.getCategories, {})
 
   const toggleTask = useMutation(api.mutations.toggleTask)
 
   const resetTasks = useMutation(api.mutations.resetTasks)
+  const ensureCurrentUser = useMutation(api.mutations.ensureCurrentUser)
+
+  useEffect(() => {
+    if (user && !user.expired) {
+      void ensureCurrentUser({}).catch((error: unknown) => {
+        console.error("Could not create the signed-in user", error);
+      });
+    }
+  }, [user, ensureCurrentUser]);
 
   const allTasks = categories?.flatMap(c => c.tasks) ?? [];
 
@@ -27,9 +39,17 @@ export default function HomePage() {
     <main className="min-h-screen bg-background font-[Arial,sans-serif] text-foreground">
       <div className="mx-auto max-w-[760px] px-6 py-12">
         <header className="mb-7">
-          <p className="text-xs font-bold tracking-[0.15em] text-primary">
-            INFINITY NIKKI
-          </p>
+          <div className="flex justify-between">
+            <p className="text-xs font-bold tracking-[0.15em] text-primary">
+              INFINITY NIKKI
+            </p>
+            <div className="flex items-center">
+              {user && <p className="pr-2">Hello {user.profile.name}</p>}
+              <Button disabled={authLoading} onClick={() => void (user ? signOut() : signIn())}>
+                {authLoading ? "Loading..." : user ? "Log out" : "Log in"}
+              </Button>
+            </div>
+          </div>
           <h1 className="my-2 text-[clamp(32px,7vw,48px)] font-bold">
             Daily checklist
           </h1>
@@ -74,8 +94,8 @@ export default function HomePage() {
                         id={`checkbox-${category.name}-${index}`}
                         name={`checkbox-${category.name}-${index}`}
                         className="mt-px h-[18px] w-[18px]"
-                        onCheckedChange={async () => {
-                          await toggleTask({ taskId: task._id })
+                        onCheckedChange={(checked) => {
+                          void toggleTask({ taskId: task._id, checked: checked === true });
                         }}
                         checked={task.checked}
                       />

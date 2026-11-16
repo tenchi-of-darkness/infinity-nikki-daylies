@@ -11,6 +11,7 @@
 import type * as mutations from "../mutations.js";
 import type * as queries from "../queries.js";
 import type * as seeding from "../seeding.js";
+import type * as userHelpers from "../userHelpers.js";
 
 import type {
   ApiFromModules,
@@ -22,6 +23,7 @@ declare const fullApi: ApiFromModules<{
   mutations: typeof mutations;
   queries: typeof queries;
   seeding: typeof seeding;
+  userHelpers: typeof userHelpers;
 }>;
 
 /**

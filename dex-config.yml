@@ -1,0 +1,27 @@
+# config.yaml
+issuer: http://192.168.178.12:5556/dex
+storage:
+  type: memory
+web:
+  http: 0.0.0.0:5556
+  allowedOrigins:
+    - "http://localhost:3000"
+staticClients:
+  - id: daylies
+    redirectURIs:
+      - "http://localhost:3000/callback"
+    postLogoutRedirectURIs:
+      - "http://localhost:3000/"
+    name: "Daylies App"
+    public: true
+enablePasswordDB: true
+pkce:
+  enforce: true
+  codeChallengeMethodsSupported:
+    - S256
+sessions: {}
+staticPasswords:
+  - email: "admin@example.com"
+    hash: "$2a$12$qpAieqrY34FyXMa5022ot.s9x6QrWIn8D5JBBRjtULiXoukCA6l1C"
+    username: "admin"
+    userID: "1234"
